@@ -2,6 +2,12 @@
 - name: Base configuration, hardening and node_exporter (all hosts)
   hosts: all
   become: true
+  pre_tasks:
+    # Fresh VMs run a full package upgrade on first boot (cloud-init):
+    # wait for it to finish instead of fighting over the dpkg lock.
+    - name: Wait for cloud-init to finish the first boot
+      ansible.builtin.command: cloud-init status --wait
+      changed_when: false
   roles:
     - common
     - hardening
