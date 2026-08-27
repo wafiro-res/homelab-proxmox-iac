@@ -88,6 +88,25 @@ Puis ouvrir Grafana sur `http://192.168.213.53:3000` (ou `grafana.lab.local` via
 └── .github/workflows/    # CI : terraform validate + ansible-lint
 ```
 
+## Le lab en images
+
+Les quatre VMs provisionnées par Terraform, avec leurs tags et l'IP remontée par l'agent :
+
+![Proxmox](docs/screenshots/proxmox.png)
+
+Chaque VM est supervisée automatiquement — la config Prometheus est templatée depuis l'inventaire :
+
+![Cibles Prometheus](docs/screenshots/prometheus-targets.png)
+
+Les métriques Node Exporter dans Grafana (dashboard 1860) :
+
+![Grafana](docs/screenshots/grafana.png)
+
+Le routage Traefik (grafana / prometheus / cv) et la page CV servie par `web-01` :
+
+![Traefik](docs/screenshots/traefik.png)
+![Site CV](docs/screenshots/cv-site.png)
+
 ## Feuille de route
 
 - [ ] Build du template cloud-init avec Packer (remplacer les commandes `qm` manuelles)
