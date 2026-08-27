@@ -45,6 +45,16 @@ variable "gateway" {
   default     = "192.168.213.1"
 }
 
+# Linked clones (false) are near-instant and write almost nothing: each VM
+# only stores its differences from the template. Trade-off: the template
+# cannot be deleted while linked clones exist. Full clones (true) are fully
+# independent but copy the whole template disk for every VM.
+variable "full_clone" {
+  description = "true = full clone (independent, slow), false = linked clone (instant, depends on the template)"
+  type        = bool
+  default     = false
+}
+
 variable "cpu_type" {
   description = "CPU type for the VMs (x86-64-v2-AES is recommended by the provider docs for modern CPUs)"
   type        = string

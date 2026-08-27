@@ -15,7 +15,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   clone {
     vm_id = var.template_vm_id
-    full  = true
+    full  = var.full_clone
   }
 
   # The guest agent is installed later by Ansible; the VMs use static IPs,
