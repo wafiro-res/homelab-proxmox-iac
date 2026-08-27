@@ -1,4 +1,9 @@
 ---
+# Versions pinned for compatibility with ansible-core 2.14 (Debian 12).
+# docker_compose_v2 needs community.docker >= 3.6; the 4.x/10.x lines
+# require a newer ansible-core.
 collections:
   - name: community.general
+    version: ">=8.0.0,<10.0.0"
   - name: community.docker
+    version: ">=3.6.0,<4.0.0"
