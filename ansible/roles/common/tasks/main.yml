@@ -1,4 +1,14 @@
 ---
+# Native apt lock waiting: any apt-get invocation (ours or a role's) blocks
+# up to 10 min for the dpkg lock instead of failing when unattended-upgrades
+# or a first-boot task holds it.
+- name: Make apt wait for the dpkg lock instead of failing
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/90lock-timeout
+    mode: "0644"
+    content: |
+      DPkg::Lock::Timeout "600";
+
 - name: Update apt cache and upgrade packages
   ansible.builtin.apt:
     lock_timeout: 600
