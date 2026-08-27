@@ -1,0 +1,29 @@
+---
+timezone: "Europe/Paris"
+
+base_packages:
+  - qemu-guest-agent
+  - curl
+  - vim
+  - htop
+  - git
+  - unzip
+  - ca-certificates
+  - gnupg
+
+# Ports opened by UFW on every host (SSH is always allowed)
+ufw_common_ports:
+  - "9100" # node_exporter, scraped by Prometheus
+
+# Extra ports per group (referenced in the hardening role)
+ufw_group_ports:
+  proxy:
+    - "80"
+    - "443"
+    - "8080" # Traefik dashboard (lab only)
+  monitoring:
+    - "9090" # Prometheus
+    - "3000" # Grafana
+  apps: []
+  web:
+    - "80"

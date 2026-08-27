@@ -1,0 +1,19 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+
+# Ansible
+ansible/inventory/hosts.yml
+*.retry
+
+# Misc
+.env
+.DS_Store
+
+# Personal data: the CV is deployed by Ansible but never pushed to GitHub
+ansible/roles/cv_site/files/www/*.pdf

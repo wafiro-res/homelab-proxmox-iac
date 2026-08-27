@@ -1,0 +1,26 @@
+---
+- name: Create site directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /opt/cv-site
+    - /opt/cv-site/www
+
+- name: Copy website content (index + CV)
+  ansible.builtin.copy:
+    src: www/
+    dest: /opt/cv-site/www/
+    mode: "0644"
+
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /opt/cv-site/docker-compose.yml
+    mode: "0644"
+
+- name: Start the web server
+  community.docker.docker_compose_v2:
+    project_src: /opt/cv-site
+    state: present

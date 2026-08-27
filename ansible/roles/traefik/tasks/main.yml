@@ -1,0 +1,32 @@
+---
+- name: Create Traefik directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /opt/traefik
+    - /opt/traefik/dynamic
+
+- name: Deploy Traefik static configuration
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: /opt/traefik/traefik.yml
+    mode: "0644"
+
+- name: Deploy dynamic routing configuration
+  ansible.builtin.template:
+    src: dynamic.yml.j2
+    dest: /opt/traefik/dynamic/routes.yml
+    mode: "0644"
+
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /opt/traefik/docker-compose.yml
+    mode: "0644"
+
+- name: Start Traefik
+  community.docker.docker_compose_v2:
+    project_src: /opt/traefik
+    state: present

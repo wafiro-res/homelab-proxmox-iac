@@ -1,0 +1,13 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# terraform.tfvars is git-ignored: secrets never reach the repository.
+
+proxmox_endpoint  = "https://192.168.213.3:8006/"
+proxmox_api_token = "terraform@pve!iac=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+node_name         = "Proxmox"
+template_vm_id    = 100
+datastore_id      = "local-lvm"
+network_bridge    = "vmbr0"
+gateway           = "192.168.213.1"
+
+vm_username         = "ansible"
+ssh_public_key_file = "~/.ssh/id_ed25519.pub"

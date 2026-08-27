@@ -1,0 +1,10 @@
+---
+services:
+  cv-site:
+    image: nginx:alpine
+    container_name: cv-site
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - /opt/cv-site/www:/usr/share/nginx/html:ro

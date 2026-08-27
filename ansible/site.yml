@@ -1,0 +1,32 @@
+---
+- name: Base configuration, hardening and node_exporter (all hosts)
+  hosts: all
+  become: true
+  roles:
+    - common
+    - hardening
+    - node_exporter
+
+- name: Install Docker on service hosts
+  hosts: proxy:apps:monitoring:web
+  become: true
+  roles:
+    - docker
+
+- name: Deploy the Traefik reverse proxy
+  hosts: proxy
+  become: true
+  roles:
+    - traefik
+
+- name: Deploy the monitoring stack (Prometheus + Grafana)
+  hosts: monitoring
+  become: true
+  roles:
+    - monitoring
+
+- name: Deploy the CV website
+  hosts: web
+  become: true
+  roles:
+    - cv_site
