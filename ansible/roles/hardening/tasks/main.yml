@@ -1,6 +1,7 @@
 ---
 - name: Install security packages
   ansible.builtin.apt:
+    lock_timeout: 600
     name:
       - ufw
       - fail2ban

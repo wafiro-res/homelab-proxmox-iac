@@ -1,12 +1,14 @@
 ---
 - name: Update apt cache and upgrade packages
   ansible.builtin.apt:
+    lock_timeout: 600
     update_cache: true
     upgrade: safe
     cache_valid_time: 3600
 
 - name: Install base packages
   ansible.builtin.apt:
+    lock_timeout: 600
     name: "{{ base_packages }}"
     state: present
 
