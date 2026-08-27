@@ -14,8 +14,17 @@
   community.general.timezone:
     name: "{{ timezone }}"
 
+# The agent needs a virtio device that Proxmox only attaches when the VM's
+# "agent" option is on. Terraform keeps it off (see main.tf), so the service
+# is started only when the device is actually present.
+- name: Check for the QEMU guest agent virtio device
+  ansible.builtin.stat:
+    path: /dev/virtio-ports/org.qemu.guest_agent.0
+  register: common_qga_device
+
 - name: Enable and start qemu-guest-agent
   ansible.builtin.service:
     name: qemu-guest-agent
     state: started
     enabled: true
+  when: common_qga_device.stat.exists

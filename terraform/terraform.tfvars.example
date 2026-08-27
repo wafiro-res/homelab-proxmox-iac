@@ -4,7 +4,7 @@
 proxmox_endpoint  = "https://192.168.213.3:8006/"
 proxmox_api_token = "terraform@pve!iac=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 node_name         = "Proxmox"
-template_vm_id    = 100
+template_vm_id    = 9000
 datastore_id      = "local-lvm"
 network_bridge    = "vmbr0"
 gateway           = "192.168.213.1"

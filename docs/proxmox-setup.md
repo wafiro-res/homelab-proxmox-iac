@@ -24,21 +24,33 @@ pveum user token add terraform@pve iac --privsep=0
 The `proxmox_api_token` variable then takes the form:
 `terraform@pve!iac=<the-secret-uuid>`
 
-## 2. Ubuntu 24.04 cloud-init template (VM ID 9000)
+## 2. Ubuntu 24.04 cloud-init template with qemu-guest-agent (VM ID 9000)
+
+The guest agent must be inside the image BEFORE the first boot, otherwise the
+bpg/proxmox provider hangs waiting for it on every `terraform apply`
+(`agent.enabled = true` requires a running agent, per the provider docs).
+`virt-customize` injects the package straight into the cloud image:
 
 ```bash
-cd /var/lib/vz/template/iso  # or any scratch directory
-wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+apt update && apt install -y libguestfs-tools
 
-qm create 9000 --name ubuntu-2404-tpl --memory 2048 --cores 2 --net0 virtio,bridge=vmbr0
+cd /tmp
+wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+virt-customize -a noble-server-cloudimg-amd64.img --install qemu-guest-agent
+
+qm create 9000 --name T-Ubuntu2404-agent --memory 2048 --cores 2 \
+  --cpu x86-64-v2-AES --net0 virtio,bridge=vmbr0 \
+  --scsihw virtio-scsi-single --agent enabled=1 --ostype l26 \
+  --serial0 socket --vga serial0
 qm importdisk 9000 noble-server-cloudimg-amd64.img local-lvm
-qm set 9000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-9000-disk-0
-qm set 9000 --ide2 local-lvm:cloudinit
+qm set 9000 --scsi0 local-lvm:vm-9000-disk-0
+qm set 9000 --ide0 local-lvm:cloudinit
 qm set 9000 --boot order=scsi0
-qm set 9000 --serial0 socket --vga serial0
-qm set 9000 --agent enabled=1
 qm template 9000
+
+rm /tmp/noble-server-cloudimg-amd64.img
 ```
 
 Adjust `local-lvm` and `vmbr0` if your storage/bridge differ — the same
-values go into `terraform.tfvars`.
+values go into `terraform.tfvars`. The cloud-init drive sits on `ide0`,
+matching `initialization.interface` in `terraform/main.tf`.

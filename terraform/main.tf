@@ -18,15 +18,14 @@ resource "proxmox_virtual_environment_vm" "vm" {
     full  = var.full_clone
   }
 
-  # The guest agent is installed later by Ansible; the VMs use static IPs,
-  # so Terraform must not wait for the agent to report one (per the provider
-  # docs, agent.enabled=true without qemu-guest-agent causes long timeouts).
+  # qemu-guest-agent is baked into the template (see docs/proxmox-setup.md),
+  # so the agent channel can be enabled safely: the provider docs warn that
+  # enabling it without the agent running in the guest causes long timeouts.
   agent {
-    enabled = false
+    enabled = true
   }
 
-  # Without the guest agent, a graceful shutdown can hang on destroy:
-  # the provider docs recommend forcing a stop instead.
+  # Hard stop on destroy keeps lab teardowns fast.
   stop_on_destroy = true
 
   cpu {

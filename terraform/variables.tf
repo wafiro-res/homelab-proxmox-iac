@@ -22,9 +22,9 @@ variable "node_name" {
 }
 
 variable "template_vm_id" {
-  description = "VM ID of the cloud-init template to clone"
+  description = "VM ID of the cloud-init template to clone (built with qemu-guest-agent baked in, see docs/proxmox-setup.md)"
   type        = number
-  default     = 100
+  default     = 9000
 }
 
 variable "datastore_id" {
