@@ -98,6 +98,13 @@ locals {
 # filtering only happens on the NICs that opted in.
 resource "proxmox_virtual_environment_cluster_firewall" "this" {
   enabled = true
+
+  # Explicitly permissive at the datacenter level: filtering only happens on
+  # the DMZ VMs' NICs. Without these, the provider defaults input to DROP on
+  # the host itself.
+  input_policy   = "ACCEPT"
+  output_policy  = "ACCEPT"
+  forward_policy = "ACCEPT"
 }
 
 resource "proxmox_virtual_environment_firewall_options" "dmz" {

@@ -5,11 +5,12 @@
     state: directory
     mode: "0755"
 
-- name: Add Docker GPG key
-  ansible.builtin.get_url:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    dest: /etc/apt/keyrings/docker.asc
-    mode: "0644"
+# get_url from ansible-core 2.14 breaks against Python 3.12 targets
+# (Ubuntu 24.04); curl with "creates:" stays idempotent and works everywhere.
+- name: Add Docker GPG key  # noqa: command-instead-of-module (get_url broken on py3.12 targets with core 2.14)
+  ansible.builtin.command:
+    cmd: curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    creates: /etc/apt/keyrings/docker.asc
 
 - name: Add Docker apt repository
   ansible.builtin.apt_repository:
