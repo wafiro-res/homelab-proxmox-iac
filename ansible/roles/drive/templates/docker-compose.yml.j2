@@ -1,0 +1,31 @@
+---
+services:
+  db:
+    image: mariadb:11
+    container_name: drive-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ drive_db_root_password }}"
+      MARIADB_DATABASE: nextcloud
+      MARIADB_USER: nextcloud
+      MARIADB_PASSWORD: "{{ drive_db_password }}"
+    volumes:
+      - /srv/drive/db:/var/lib/mysql
+
+  nextcloud:
+    image: nextcloud:stable
+    container_name: drive-nextcloud
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: "{{ drive_db_password }}"
+      NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local"
+    volumes:
+      - /srv/drive/nextcloud:/var/www/html

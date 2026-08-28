@@ -16,7 +16,7 @@ TF_DIR="$REPO_DIR/terraform"
 VMS_FILE="$TF_DIR/vms.auto.tfvars.json"
 
 FLAVORS=("m1.small" "m1.medium" "m1.large")
-GROUPS_ALLOWED=("proxy" "apps" "monitoring" "web")
+GROUPS_ALLOWED=("proxy" "apps" "monitoring" "web" "drive")
 SUBNET_PREFIX="192.168.213"
 
 command -v jq >/dev/null || { echo "jq is required: apt install -y jq"; exit 1; }
@@ -83,14 +83,23 @@ add_vm() {
   local ip="$SUBNET_PREFIX.$REPLY/24"
   jq -e --arg ip "$ip" '.vms[] | select(.ip == $ip)' "$VMS_FILE" >/dev/null && { echo "ERROR: $ip already used."; exit 1; }
 
+  read -rp "Data disk? (empty = none, else '<storage>:<sizeGB>' e.g. hdd1:200): " dd
+  local dd_json="null"
+  if [ -n "$dd" ]; then
+    local dd_store="${dd%%:*}" dd_size="${dd##*:}"
+    [[ "$dd_size" =~ ^[0-9]+$ ]] || { echo "ERROR: bad data disk format, expected storage:sizeGB"; exit 1; }
+    dd_json=$(jq -n --arg s "$dd_store" --argjson g "$dd_size" '{datastore_id: $s, size_gb: $g}')
+  fi
+
   echo
-  echo ">> $name  (id $vm_id, $group, $flavor, $ip)"
+  echo ">> $name  (id $vm_id, $group, $flavor, $ip, data_disk: $dd)"
   read -rp "Add this VM? [y/N]: " ok
   [[ "$ok" =~ ^[yYoO] ]] || { echo "Aborted."; exit 0; }
 
   local tmp; tmp=$(mktemp)
   jq --arg n "$name" --argjson i "$vm_id" --arg g "$group" --arg f "$flavor" --arg ip "$ip" \
-     '.vms[$n] = {vm_id: $i, group: $g, flavor: $f, ip: $ip}' "$VMS_FILE" > "$tmp" && mv "$tmp" "$VMS_FILE"
+     --argjson dd "$dd_json" \
+     '.vms[$n] = {vm_id: $i, group: $g, flavor: $f, ip: $ip} + (if $dd == null then {} else {data_disk: $dd} end)' "$VMS_FILE" > "$tmp" && mv "$tmp" "$VMS_FILE"
   echo "Written to $VMS_FILE."
   offer_apply
 }

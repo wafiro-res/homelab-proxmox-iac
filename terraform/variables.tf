@@ -108,6 +108,12 @@ variable "vms" {
     group  = string
     flavor = string
     ip     = string # CIDR notation, e.g. 192.168.213.51/24
+    # Optional extra data disk, e.g. on a HDD datastore while the OS
+    # disk stays on the SSD thin pool: { datastore_id = "hdd1", size_gb = 200 }
+    data_disk = optional(object({
+      datastore_id = string
+      size_gb      = number
+    }))
   }))
   default = {
     proxy-01 = {
@@ -137,7 +143,7 @@ variable "vms" {
   }
 
   validation {
-    condition     = alltrue([for v in var.vms : contains(["proxy", "apps", "monitoring", "web"], v.group)])
-    error_message = "Each VM's group must be one of: proxy, apps, monitoring, web."
+    condition     = alltrue([for v in var.vms : contains(["proxy", "apps", "monitoring", "web", "drive"], v.group)])
+    error_message = "Each VM's group must be one of: proxy, apps, monitoring, web, drive."
   }
 }

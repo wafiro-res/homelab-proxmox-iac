@@ -1,0 +1,47 @@
+---
+- name: Install partitioning tools
+  ansible.builtin.apt:
+    lock_timeout: 600
+    name: parted
+    state: present
+
+- name: Partition the data disk (scsi1 = /dev/sdb)
+  community.general.parted:
+    device: /dev/sdb
+    number: 1
+    state: present
+    fs_type: ext4
+
+- name: Create the filesystem on the data disk
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/sdb1
+
+- name: Mount the data disk on /srv/drive (persistent via fstab)
+  ansible.posix.mount:
+    path: /srv/drive
+    src: /dev/sdb1
+    fstype: ext4
+    opts: defaults,noatime
+    state: mounted
+
+- name: Create Nextcloud directories on the data disk
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /opt/drive
+    - /srv/drive/nextcloud
+    - /srv/drive/db
+
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /opt/drive/docker-compose.yml
+    mode: "0600"
+
+- name: Start Nextcloud
+  community.docker.docker_compose_v2:
+    project_src: /opt/drive
+    state: present

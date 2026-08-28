@@ -14,7 +14,7 @@
     - node_exporter
 
 - name: Install Docker on service hosts
-  hosts: proxy:apps:monitoring:web
+  hosts: proxy:apps:monitoring:web:drive
   become: true
   roles:
     - docker
@@ -36,3 +36,9 @@
   become: true
   roles:
     - cv_site
+
+- name: Deploy the shared drive (Nextcloud)
+  hosts: drive
+  become: true
+  roles:
+    - drive

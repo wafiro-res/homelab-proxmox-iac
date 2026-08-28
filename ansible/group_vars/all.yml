@@ -27,3 +27,10 @@ ufw_group_ports:
   apps: []
   web:
     - "80"
+  drive:
+    - "80"
+
+# Shared drive (Nextcloud) — CHANGE these before deploying for real,
+# or better: move them to an Ansible Vault.
+drive_db_password: "changeme-drive-db"
+drive_db_root_password: "changeme-drive-root"

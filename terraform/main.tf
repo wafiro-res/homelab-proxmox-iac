@@ -43,6 +43,17 @@ resource "proxmox_virtual_environment_vm" "vm" {
     size         = each.value.disk_gb
   }
 
+  # Optional data disk on another datastore (e.g. HDD for bulk storage).
+  dynamic "disk" {
+    for_each = each.value.data_disk == null ? [] : [each.value.data_disk]
+    content {
+      datastore_id = disk.value.datastore_id
+      interface    = "scsi1"
+      size         = disk.value.size_gb
+      file_format  = "raw"
+    }
+  }
+
   network_device {
     bridge = var.network_bridge
   }

@@ -14,6 +14,12 @@ http:
       rule: "Host(`cv.lab.local`)"
       entryPoints: [web]
       service: cv
+{% if groups['drive'] is defined and groups['drive'] | length > 0 %}
+    drive:
+      rule: "Host(`drive.lab.local`)"
+      entryPoints: [web]
+      service: drive
+{% endif %}
 
   services:
     grafana:
@@ -28,3 +34,9 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{ hostvars[groups['web'] | first].ansible_host }}:80"
+{% if groups['drive'] is defined and groups['drive'] | length > 0 %}
+    drive:
+      loadBalancer:
+        servers:
+          - url: "http://{{ hostvars[groups['drive'] | first].ansible_host }}:80"
+{% endif %}
