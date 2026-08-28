@@ -56,6 +56,8 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   network_device {
     bridge = var.network_bridge
+    # The Proxmox firewall only filters NICs that opt in.
+    firewall = each.value.dmz
   }
 
   operating_system {
@@ -78,4 +80,89 @@ resource "proxmox_virtual_environment_vm" "vm" {
       keys     = [trimspace(file(pathexpand(var.ssh_public_key_file)))]
     }
   }
+}
+
+# ---------------------------------------------------------------------------
+# DMZ: per-VM Proxmox firewall for exposed machines (dmz = true).
+# Defense in depth — this is OUTSIDE the VM, so it holds even if the VM
+# itself is compromised (unlike its internal UFW).
+# ---------------------------------------------------------------------------
+
+locals {
+  dmz_vms        = { for name, vm in local.vm_specs : name => vm if vm.dmz }
+  monitoring_ips = [for vm in var.vms : split("/", vm.ip)[0] if vm.group == "monitoring"]
+}
+
+# The datacenter-level firewall must be enabled for VM rules to apply.
+# Policies stay ACCEPT here: nothing changes for the host or other VMs,
+# filtering only happens on the NICs that opted in.
+resource "proxmox_virtual_environment_cluster_firewall" "this" {
+  enabled = true
+}
+
+resource "proxmox_virtual_environment_firewall_options" "dmz" {
+  for_each = local.dmz_vms
+
+  node_name = var.node_name
+  vm_id     = each.value.vm_id
+
+  enabled       = true
+  input_policy  = "DROP"
+  output_policy = "ACCEPT"
+
+  depends_on = [proxmox_virtual_environment_vm.vm]
+}
+
+resource "proxmox_virtual_environment_firewall_rules" "dmz" {
+  for_each = local.dmz_vms
+
+  node_name = var.node_name
+  vm_id     = each.value.vm_id
+
+  # Inbound: web for everyone, SSH only from the management host,
+  # node_exporter only from the monitoring host(s).
+  rule {
+    type    = "in"
+    action  = "ACCEPT"
+    proto   = "tcp"
+    dport   = "80,443"
+    comment = "web"
+  }
+  rule {
+    type    = "in"
+    action  = "ACCEPT"
+    proto   = "tcp"
+    dport   = "22"
+    source  = var.mgmt_ip
+    comment = "SSH from mgmt only"
+  }
+  dynamic "rule" {
+    for_each = local.monitoring_ips
+    content {
+      type    = "in"
+      action  = "ACCEPT"
+      proto   = "tcp"
+      dport   = "9100"
+      source  = rule.value
+      comment = "node_exporter scrape from monitoring"
+    }
+  }
+
+  # Outbound: DNS allowed anywhere, then the whole LAN is denied —
+  # a compromised DMZ VM cannot pivot to the other machines.
+  rule {
+    type    = "out"
+    action  = "ACCEPT"
+    proto   = "udp"
+    dport   = "53"
+    comment = "DNS"
+  }
+  rule {
+    type    = "out"
+    action  = "DROP"
+    dest    = var.lan_cidr
+    comment = "no lateral movement to the LAN"
+  }
+
+  depends_on = [proxmox_virtual_environment_firewall_options.dmz]
 }

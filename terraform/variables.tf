@@ -114,6 +114,10 @@ variable "vms" {
       datastore_id = string
       size_gb      = number
     }))
+    # DMZ: isolate this VM with the Proxmox firewall — inbound limited to
+    # web/SSH-from-mgmt/metrics, outbound to the LAN denied (no lateral
+    # movement if the VM is ever compromised).
+    dmz = optional(bool, false)
   }))
   default = {
     proxy-01 = {
@@ -146,4 +150,16 @@ variable "vms" {
     condition     = alltrue([for v in var.vms : contains(["proxy", "apps", "monitoring", "web", "drive"], v.group)])
     error_message = "Each VM's group must be one of: proxy, apps, monitoring, web, drive."
   }
+}
+
+variable "lan_cidr" {
+  description = "LAN subnet a DMZ VM must NOT be able to reach"
+  type        = string
+  default     = "192.168.213.0/24"
+}
+
+variable "mgmt_ip" {
+  description = "Management host (Ansible/SSH) allowed to reach DMZ VMs on port 22"
+  type        = string
+  default     = "192.168.213.50"
 }

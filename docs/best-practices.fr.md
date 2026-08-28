@@ -45,6 +45,18 @@ Les règles que ce dépôt suit — et pourquoi. À relire avant toute opératio
 - Une tâche Proxmox à 100 % n'est pas finie : attendre le retour du prompt.
   Ne jamais interrompre une écriture en cours (Ctrl+C = état incohérent).
 
+## Exposer un service sur internet
+
+- **Jamais d'ouverture de port directe** sans y avoir réfléchi : préférer un
+  tunnel sortant (Cloudflare Tunnel) qui cache l'IP et n'ouvre rien sur la box.
+- Toute VM exposée passe en **DMZ** (`dmz: true` dans la définition de la VM,
+  proposé par `newvm.sh`) : pare-feu Proxmox sur son interface — entrées
+  limitées (web, SSH depuis mgmt-01, métriques vers monitoring), **sorties
+  vers le LAN interdites**. Une VM compromise ne peut pas pivoter vers les
+  autres machines. Ce pare-feu vit HORS de la VM : il tient même si la VM
+  est compromise (contrairement à son UFW interne, qui reste une 2e couche).
+- Dans l'application exposée : mots de passe forts, 2FA, mises à jour suivies.
+
 ## Sauvegardes (à mettre en place — roadmap)
 
 - Avant toute opération destructive sur drive-01 : snapshot Proxmox a minima,

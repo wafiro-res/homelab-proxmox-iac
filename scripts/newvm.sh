@@ -91,15 +91,19 @@ add_vm() {
     dd_json=$(jq -n --arg s "$dd_store" --argjson g "$dd_size" '{datastore_id: $s, size_gb: $g}')
   fi
 
+  read -rp "DMZ? Isolate this VM from the LAN with the Proxmox firewall (for exposed VMs) [y/N]: " dmz_ans
+  local dmz="false"
+  [[ "$dmz_ans" =~ ^[yYoO] ]] && dmz="true"
+
   echo
-  echo ">> $name  (id $vm_id, $group, $flavor, $ip, data_disk: $dd)"
+  echo ">> $name  (id $vm_id, $group, $flavor, $ip, data_disk: $dd, dmz: $dmz)"
   read -rp "Add this VM? [y/N]: " ok
   [[ "$ok" =~ ^[yYoO] ]] || { echo "Aborted."; exit 0; }
 
   local tmp; tmp=$(mktemp)
   jq --arg n "$name" --argjson i "$vm_id" --arg g "$group" --arg f "$flavor" --arg ip "$ip" \
-     --argjson dd "$dd_json" \
-     '.vms[$n] = {vm_id: $i, group: $g, flavor: $f, ip: $ip} + (if $dd == null then {} else {data_disk: $dd} end)' "$VMS_FILE" > "$tmp" && mv "$tmp" "$VMS_FILE"
+     --argjson dd "$dd_json" --argjson z "$dmz" \
+     '.vms[$n] = {vm_id: $i, group: $g, flavor: $f, ip: $ip, dmz: $z} + (if $dd == null then {} else {data_disk: $dd} end)' "$VMS_FILE" > "$tmp" && mv "$tmp" "$VMS_FILE"
   echo "Written to $VMS_FILE."
   offer_apply "$name,monitoring,proxy"
 }
