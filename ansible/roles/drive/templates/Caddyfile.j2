@@ -1,8 +1,13 @@
-# Public site: Let's Encrypt via the DNS-01 challenge (DuckDNS API) —
-# no inbound port is needed to obtain the certificate (the ISP blocks 80).
+# Public site: Let's Encrypt via the DNS-01 challenge (OVH API) — no inbound
+# port is needed to obtain the certificate.
 {{ drive_domain }} {
     tls {
-        dns duckdns {{ drive_duckdns_token }}
+        dns ovh {
+            endpoint {{ drive_ovh_endpoint }}
+            application_key {{ drive_ovh_application_key }}
+            application_secret {{ drive_ovh_application_secret }}
+            consumer_key {{ drive_ovh_consumer_key }}
+        }
     }
     reverse_proxy nextcloud:80
     encode gzip

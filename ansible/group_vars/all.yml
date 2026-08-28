@@ -36,12 +36,13 @@ ufw_group_ports:
 drive_db_password: "changeme-drive-db"
 drive_db_root_password: "changeme-drive-root"
 
-# Public exposure of the drive (free): DuckDNS subdomain + Let's Encrypt via
-# Caddy. Create the subdomain and get the token on https://www.duckdns.org,
-# then fill these in (move the token to Ansible Vault when possible).
-drive_duckdns_subdomain: "CHANGEME" # -> CHANGEME.duckdns.org
-drive_duckdns_token: "CHANGEME"
-drive_domain: "{{ drive_duckdns_subdomain }}.duckdns.org"
+# Public exposure of the drive: own OVH subdomain + Let's Encrypt certificate
+# obtained through the ACME DNS-01 challenge (the ISP blocks inbound port 80).
+# Caddy creates the validation TXT record via the OVH API — credentials live
+# in secrets.yml (drive_ovh_*). The A record for the subdomain must point to
+# the home public IP (set it in the OVH DNS zone).
+drive_domain: "drive.businesscare.space"
+drive_ovh_endpoint: "ovh-eu"
 # External HTTPS port forwarded by the router (443 was taken by the
 # AnyConnect VPN server). Users reach https://<domain>:<this port>.
 drive_public_port: "8443"

@@ -68,3 +68,26 @@
     project_src: /opt/drive
     state: present
     build: policy
+    remove_orphans: true
+
+# trusted_domains / overwrite settings are written into config.php at first
+# init only, so the container env vars do not re-apply on later runs. Set them
+# idempotently with occ so the public domain + port are always accepted.
+- name: Wait for the Nextcloud container to be ready
+  ansible.builtin.command: docker exec -u www-data drive-nextcloud php occ status
+  register: drive_nc_status
+  until: drive_nc_status.rc == 0
+  retries: 30
+  delay: 5
+  changed_when: false
+
+- name: Configure trusted domains and public URL (occ)
+  ansible.builtin.command: "docker exec -u www-data drive-nextcloud php occ config:system:set {{ item }}"
+  loop:
+    - "trusted_domains 0 --value={{ ansible_host }}"
+    - "trusted_domains 1 --value=drive.lab.local"
+    - "trusted_domains 2 --value={{ drive_domain }}:{{ drive_public_port }}"
+    - "overwritehost --value={{ drive_domain }}:{{ drive_public_port }}"
+    - "overwriteprotocol --value=https"
+    - "overwrite.cli.url --value=https://{{ drive_domain }}:{{ drive_public_port }}"
+  changed_when: false
