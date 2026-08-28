@@ -63,6 +63,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: drive-cloudflared
     restart: unless-stopped
+    network_mode: host
     command: tunnel --no-autoupdate run
     environment:
       TUNNEL_TOKEN: "{{ drive_cloudflare_tunnel_token }}"
