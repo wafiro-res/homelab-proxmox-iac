@@ -101,7 +101,7 @@ add_vm() {
      --argjson dd "$dd_json" \
      '.vms[$n] = {vm_id: $i, group: $g, flavor: $f, ip: $ip} + (if $dd == null then {} else {data_disk: $dd} end)' "$VMS_FILE" > "$tmp" && mv "$tmp" "$VMS_FILE"
   echo "Written to $VMS_FILE."
-  offer_apply
+  offer_apply "$name,monitoring,proxy"
 }
 
 remove_vm() {
@@ -113,16 +113,22 @@ remove_vm() {
   local tmp; tmp=$(mktemp)
   jq --arg n "$name" 'del(.vms[$n])' "$VMS_FILE" > "$tmp" && mv "$tmp" "$VMS_FILE"
   echo "Removed from $VMS_FILE."
-  offer_apply
+  offer_apply "monitoring,proxy"
 }
 
 offer_apply() {
+  # Best practice: only touch what changed. The new VM gets its full
+  # configuration; "monitoring" re-templates the Prometheus scrape config
+  # (built from the inventory) and "proxy" refreshes the Traefik routes.
+  # A full "ansible-playbook site.yml" (no --limit) is still worth running
+  # from time to time to correct configuration drift on every host.
+  local limit="$1"
   read -rp "Run terraform apply now? [y/N]: " ok
   [[ "$ok" =~ ^[yYoO] ]] || { echo "OK — run it later: cd terraform && terraform apply"; return; }
   (cd "$TF_DIR" && terraform apply)
-  read -rp "Run ansible-playbook site.yml now? [y/N]: " ok2
-  [[ "$ok2" =~ ^[yYoO] ]] || { echo "OK — run it later: cd ansible && ansible-playbook site.yml"; return; }
-  (cd "$REPO_DIR/ansible" && ansible-playbook site.yml)
+  read -rp "Run ansible-playbook (--limit $limit) now? [y/N]: " ok2
+  [[ "$ok2" =~ ^[yYoO] ]] || { echo "OK — run it later: cd ansible && ansible-playbook site.yml --limit '$limit'"; return; }
+  (cd "$REPO_DIR/ansible" && ansible-playbook site.yml --limit "$limit")
 }
 
 case "${1:-}" in

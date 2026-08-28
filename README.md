@@ -122,6 +122,10 @@ Traefik routing (grafana / prometheus / cv) and the CV page served by `web-01`:
 ![Traefik](docs/screenshots/traefik.png)
 ![CV site](docs/screenshots/cv-site.png)
 
+## Best practices
+
+The conventions this lab follows (single source of truth, targeted Ansible runs, replace rules, storage lessons learned): [docs/best-practices.fr.md](docs/best-practices.fr.md) 🇫🇷
+
 ## Roadmap
 
 - [ ] Packer build of the cloud-init template (replace the manual `qm` steps)
