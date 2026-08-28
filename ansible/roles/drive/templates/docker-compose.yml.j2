@@ -36,13 +36,13 @@ services:
       MYSQL_USER: nextcloud
       MYSQL_PASSWORD: "{{ drive_db_password }}"
       REDIS_HOST: redis
-      NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local {{ drive_domain }}"
+      NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local {{ drive_domain }} {{ drive_domain }}:{{ drive_public_port }}"
       # HTTPS URLs only for requests coming through the Caddy proxy
       # (docker network), so plain-HTTP LAN access keeps working.
       TRUSTED_PROXIES: "172.16.0.0/12"
       OVERWRITEPROTOCOL: https
       OVERWRITECONDADDR: "^172\\..*"
-      OVERWRITECLIURL: "https://{{ drive_domain }}"
+      OVERWRITECLIURL: "https://{{ drive_domain }}:{{ drive_public_port }}"
       PHP_MEMORY_LIMIT: 1G
       PHP_UPLOAD_LIMIT: 16G
     volumes:

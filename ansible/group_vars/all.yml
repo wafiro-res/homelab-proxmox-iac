@@ -42,3 +42,6 @@ drive_db_root_password: "changeme-drive-root"
 drive_duckdns_subdomain: "CHANGEME" # -> CHANGEME.duckdns.org
 drive_duckdns_token: "CHANGEME"
 drive_domain: "{{ drive_duckdns_subdomain }}.duckdns.org"
+# External HTTPS port forwarded by the router (443 was taken by the
+# AnyConnect VPN server). Users reach https://<domain>:<this port>.
+drive_public_port: "8443"
