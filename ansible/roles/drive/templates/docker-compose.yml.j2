@@ -34,7 +34,7 @@ services:
       MYSQL_PASSWORD: "{{ drive_db_password }}"
       REDIS_HOST: redis
       NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local {{ drive_domain }}"
-      TRUSTED_PROXIES: "172.16.0.0/12"
+      TRUSTED_PROXIES: "127.0.0.1 172.16.0.0/12 ::1"
       OVERWRITEPROTOCOL: https
       OVERWRITEHOST: "{{ drive_domain }}"
       OVERWRITECLIURL: "https://{{ drive_domain }}"
@@ -53,6 +53,7 @@ services:
       - redis
     volumes:
       - /srv/drive/nextcloud:/var/www/html
+{% if drive_cloudflare_tunnel_token is defined and drive_cloudflare_tunnel_token %}
 
   # Cloudflare Tunnel: outbound-only link to Cloudflare's edge. No inbound
   # port, the home IP stays hidden, TLS is terminated by Cloudflare. The
@@ -67,3 +68,4 @@ services:
       TUNNEL_TOKEN: "{{ drive_cloudflare_tunnel_token }}"
     depends_on:
       - nextcloud
+{% endif %}

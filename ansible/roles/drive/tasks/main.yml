@@ -1,9 +1,15 @@
 ---
+- name: Check if secondary data disk /dev/sdb exists
+  ansible.builtin.stat:
+    path: /dev/sdb
+  register: drive_data_disk
+
 - name: Install partitioning tools
   ansible.builtin.apt:
     lock_timeout: 600
     name: parted
     state: present
+  when: drive_data_disk.stat.exists
 
 - name: Partition the data disk (scsi1 = /dev/sdb)
   community.general.parted:
@@ -11,11 +17,13 @@
     number: 1
     state: present
     fs_type: ext4
+  when: drive_data_disk.stat.exists
 
 - name: Create the filesystem on the data disk
   community.general.filesystem:
     fstype: ext4
     dev: /dev/sdb1
+  when: drive_data_disk.stat.exists
 
 - name: Mount the data disk on /srv/drive (persistent via fstab)
   ansible.posix.mount:
@@ -24,8 +32,9 @@
     fstype: ext4
     opts: defaults,noatime
     state: mounted
+  when: drive_data_disk.stat.exists
 
-- name: Create Nextcloud directories on the data disk
+- name: Create Nextcloud directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -59,7 +68,7 @@
   delay: 5
   changed_when: false
 
-- name: Configure trusted domains and public URL (occ)
+- name: Configure trusted domains, proxies and public URL (occ)
   ansible.builtin.command: "docker exec -u www-data drive-nextcloud php occ config:system:set {{ item }}"
   loop:
     - "trusted_domains 0 --value={{ ansible_host }}"
@@ -68,4 +77,7 @@
     - "overwritehost --value={{ drive_domain }}"
     - "overwriteprotocol --value=https"
     - "overwrite.cli.url --value=https://{{ drive_domain }}"
+    - "trusted_proxies 0 --value=127.0.0.1"
+    - "trusted_proxies 1 --value=172.16.0.0/12"
+    - "trusted_proxies 2 --value=::1"
   changed_when: false
