@@ -1,4 +1,10 @@
+# Public site: automatic Let's Encrypt TLS.
 {{ drive_domain }} {
     reverse_proxy nextcloud:80
     encode gzip
+}
+
+# Plain-HTTP LAN access (fallback/debug): proxied without TLS.
+http://{{ ansible_host }}, http://drive.lab.local {
+    reverse_proxy nextcloud:80
 }

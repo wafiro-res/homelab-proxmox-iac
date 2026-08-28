@@ -28,8 +28,6 @@ services:
     depends_on:
       - db
       - redis
-    ports:
-      - "80:80"
     environment:
       MYSQL_HOST: db
       MYSQL_DATABASE: nextcloud
@@ -66,6 +64,7 @@ services:
     container_name: drive-caddy
     restart: unless-stopped
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - /opt/drive/Caddyfile:/etc/caddy/Caddyfile:ro
