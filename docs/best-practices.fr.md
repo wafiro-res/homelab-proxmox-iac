@@ -56,6 +56,12 @@ Les règles que ce dépôt suit — et pourquoi. À relire avant toute opératio
   autres machines. Ce pare-feu vit HORS de la VM : il tient même si la VM
   est compromise (contrairement à son UFW interne, qui reste une 2e couche).
 - Dans l'application exposée : mots de passe forts, 2FA, mises à jour suivies.
+- Derrière un tunnel/reverse proxy, l'appli voit l'IP du proxy, pas celle du
+  visiteur : configurer `trusted_proxies` pour que l'anti-force-brute et les
+  logs voient la vraie IP (`CF-Connecting-IP` avec Cloudflare) et bannissent
+  l'attaquant, pas tout le monde.
+- Vérifier l'exposition de l'extérieur : scan.nextcloud.com, SSL Labs,
+  securityheaders.com — viser A/A+ (HSTS, min TLS 1.2, CSP).
 
 ## Sauvegardes (à mettre en place — roadmap)
 
