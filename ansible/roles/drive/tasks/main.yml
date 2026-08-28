@@ -68,7 +68,7 @@
   delay: 5
   changed_when: false
 
-- name: Configure trusted domains, proxies and public URL (occ)
+- name: Configure trusted domains, proxies, default app and public URL (occ)
   ansible.builtin.command: "docker exec -u www-data drive-nextcloud php occ config:system:set {{ item }}"
   loop:
     - "trusted_domains 0 --value={{ ansible_host }}"
@@ -80,4 +80,20 @@
     - "trusted_proxies 0 --value=127.0.0.1"
     - "trusted_proxies 1 --value=172.16.0.0/12"
     - "trusted_proxies 2 --value=::1"
+    - "defaultapp --value=files"
+    - "skeletondirectory --value="
+  changed_when: false
+
+- name: Disable clutter apps for a clean Drive and Photos experience
+  ansible.builtin.command: "docker exec -u www-data drive-nextcloud php occ app:disable {{ item }}"
+  loop:
+    - dashboard
+    - weather_status
+    - user_status
+    - survey_client
+    - recommendations
+    - firstrunwizard
+    - nextcloud_announcements
+    - whats_new
+  failed_when: false
   changed_when: false
