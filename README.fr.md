@@ -7,6 +7,10 @@
 ![Ansible](https://img.shields.io/badge/Ansible-automation-EE0000?logo=ansible&logoColor=white)
 ![Proxmox](https://img.shields.io/badge/Proxmox-VE-E57000?logo=proxmox&logoColor=white)
 
+![SSL Labs A+](https://img.shields.io/badge/SSL_Labs-A%2B-brightgreen)
+![Security Headers A+](https://img.shields.io/badge/Security_Headers-A%2B-brightgreen)
+![Nextcloud Scan A+](https://img.shields.io/badge/Nextcloud_Scan-A%2B-brightgreen)
+
 Infrastructure as Code de bout en bout pour mon homelab Proxmox : **Terraform** provisionne les machines virtuelles, **Ansible** les configure, les durcit et déploie les services. Un `terraform apply` + un `ansible-playbook` et tout l'environnement existe — reproductible, versionné, destructible à volonté. Il héberge même un cloud auto-hébergé, isolé en DMZ et exposé sur internet via un tunnel Cloudflare, sans aucun port ouvert.
 
 ## Architecture
@@ -102,7 +106,7 @@ nouvelle VM est clonée, durcie, reçoit Docker et apparaît dans Prometheus/Gra
   et mises à jour de sécurité automatiques sur chaque VM.
 - **Vérifié de l'extérieur** — le Nextcloud exposé obtient **A+** au
   [scan officiel Nextcloud](https://scan.nextcloud.com), **A+** chez
-  [Qualys SSL Labs](https://www.ssllabs.com/ssltest/) et **A** sur
+  [Qualys SSL Labs](https://www.ssllabs.com/ssltest/) et **A+** sur
   securityheaders.com (HSTS, CSP, cookies sécurisés, 2FA imposée).
 
 ## Leçons apprises

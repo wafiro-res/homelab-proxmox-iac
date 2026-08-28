@@ -7,6 +7,10 @@
 ![Ansible](https://img.shields.io/badge/Ansible-automation-EE0000?logo=ansible&logoColor=white)
 ![Proxmox](https://img.shields.io/badge/Proxmox-VE-E57000?logo=proxmox&logoColor=white)
 
+![SSL Labs A+](https://img.shields.io/badge/SSL_Labs-A%2B-brightgreen)
+![Security Headers A+](https://img.shields.io/badge/Security_Headers-A%2B-brightgreen)
+![Nextcloud Scan A+](https://img.shields.io/badge/Nextcloud_Scan-A%2B-brightgreen)
+
 End-to-end Infrastructure as Code for my Proxmox homelab: **Terraform** provisions the virtual machines, **Ansible** configures, hardens and deploys the services. One `terraform apply` + one `ansible-playbook` and the whole environment exists — reproducible, versioned, and destroyable at will. It even runs a self-hosted cloud drive, isolated in a DMZ and exposed to the internet through a Cloudflare Tunnel with no open port.
 
 ## Architecture
@@ -102,7 +106,7 @@ single file by hand.
   fail2ban, and unattended security upgrades on every VM.
 - **Verified externally** — the exposed Nextcloud scores **A+** on the official
   [Nextcloud Security Scan](https://scan.nextcloud.com), **A+** on
-  [Qualys SSL Labs](https://www.ssllabs.com/ssltest/), and **A** on
+  [Qualys SSL Labs](https://www.ssllabs.com/ssltest/), and **A+** on
   securityheaders.com (HSTS, CSP, secure cookies, 2FA enforced).
 
 ## Lessons learned
