@@ -34,6 +34,14 @@
     - /opt/drive
     - /srv/drive/nextcloud
     - /srv/drive/db
+    - /srv/drive/caddy-data
+    - /srv/drive/caddy-config
+
+- name: Deploy Caddyfile (TLS reverse proxy)
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: /opt/drive/Caddyfile
+    mode: "0644"
 
 - name: Deploy docker-compose file
   ansible.builtin.template:

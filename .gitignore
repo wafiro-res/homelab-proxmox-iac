@@ -17,3 +17,6 @@ ansible/inventory/hosts.yml
 
 # Personal data: the CV is deployed by Ansible but never pushed to GitHub
 ansible/roles/cv_site/files/www/*.pdf
+
+# Local secrets (real passwords/tokens): never committed
+ansible/secrets.yml

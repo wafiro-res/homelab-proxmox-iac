@@ -36,7 +36,13 @@ services:
       MYSQL_USER: nextcloud
       MYSQL_PASSWORD: "{{ drive_db_password }}"
       REDIS_HOST: redis
-      NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local"
+      NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local {{ drive_domain }}"
+      # HTTPS URLs only for requests coming through the Caddy proxy
+      # (docker network), so plain-HTTP LAN access keeps working.
+      TRUSTED_PROXIES: "172.16.0.0/12"
+      OVERWRITEPROTOCOL: https
+      OVERWRITECONDADDR: "^172\\..*"
+      OVERWRITECLIURL: "https://{{ drive_domain }}"
       PHP_MEMORY_LIMIT: 1G
       PHP_UPLOAD_LIMIT: 16G
     volumes:
@@ -53,3 +59,27 @@ services:
       - redis
     volumes:
       - /srv/drive/nextcloud:/var/www/html
+
+  # TLS termination with automatic Let's Encrypt certificates.
+  caddy:
+    image: caddy:2
+    container_name: drive-caddy
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - /opt/drive/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /srv/drive/caddy-data:/data
+      - /srv/drive/caddy-config:/config
+    depends_on:
+      - nextcloud
+
+  # Keeps the DuckDNS record pointing at the home public IP.
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: drive-duckdns
+    restart: unless-stopped
+    environment:
+      SUBDOMAINS: "{{ drive_duckdns_subdomain }}"
+      TOKEN: "{{ drive_duckdns_token }}"
+      TZ: "Europe/Paris"

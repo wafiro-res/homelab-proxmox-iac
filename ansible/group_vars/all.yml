@@ -29,8 +29,16 @@ ufw_group_ports:
     - "80"
   drive:
     - "80"
+    - "443"
 
 # Shared drive (Nextcloud) — CHANGE these before deploying for real,
 # or better: move them to an Ansible Vault.
 drive_db_password: "changeme-drive-db"
 drive_db_root_password: "changeme-drive-root"
+
+# Public exposure of the drive (free): DuckDNS subdomain + Let's Encrypt via
+# Caddy. Create the subdomain and get the token on https://www.duckdns.org,
+# then fill these in (move the token to Ansible Vault when possible).
+drive_duckdns_subdomain: "CHANGEME" # -> CHANGEME.duckdns.org
+drive_duckdns_token: "CHANGEME"
+drive_domain: "{{ drive_duckdns_subdomain }}.duckdns.org"
