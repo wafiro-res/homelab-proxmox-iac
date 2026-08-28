@@ -34,28 +34,6 @@
     - /opt/drive
     - /srv/drive/nextcloud
     - /srv/drive/db
-    - /srv/drive/caddy-data
-    - /srv/drive/caddy-config
-
-- name: Create the Caddy image build directory
-  ansible.builtin.file:
-    path: /opt/drive/caddy
-    state: directory
-    mode: "0755"
-
-- name: Deploy the Caddy Dockerfile (DuckDNS DNS module)
-  ansible.builtin.copy:
-    src: Dockerfile.caddy
-    dest: /opt/drive/caddy/Dockerfile
-    mode: "0644"
-  notify: Restart drive stack
-
-- name: Deploy Caddyfile (TLS reverse proxy)
-  ansible.builtin.template:
-    src: Caddyfile.j2
-    dest: /opt/drive/Caddyfile
-    mode: "0644"
-  notify: Restart drive stack
 
 - name: Deploy docker-compose file
   ansible.builtin.template:
@@ -63,16 +41,16 @@
     dest: /opt/drive/docker-compose.yml
     mode: "0600"
 
-- name: Start Nextcloud
+- name: Start the drive stack
   community.docker.docker_compose_v2:
     project_src: /opt/drive
     state: present
-    build: policy
     remove_orphans: true
 
 # trusted_domains / overwrite settings are written into config.php at first
-# init only, so the container env vars do not re-apply on later runs. Set them
-# idempotently with occ so the public domain + port are always accepted.
+# init only, so container env vars do not re-apply later. Set them idempotently
+# with occ so the public domain is always accepted (Cloudflare terminates TLS,
+# so no port in the URL).
 - name: Wait for the Nextcloud container to be ready
   ansible.builtin.command: docker exec -u www-data drive-nextcloud php occ status
   register: drive_nc_status
@@ -86,8 +64,8 @@
   loop:
     - "trusted_domains 0 --value={{ ansible_host }}"
     - "trusted_domains 1 --value=drive.lab.local"
-    - "trusted_domains 2 --value={{ drive_domain }}:{{ drive_public_port }}"
-    - "overwritehost --value={{ drive_domain }}:{{ drive_public_port }}"
+    - "trusted_domains 2 --value={{ drive_domain }}"
+    - "overwritehost --value={{ drive_domain }}"
     - "overwriteprotocol --value=https"
-    - "overwrite.cli.url --value=https://{{ drive_domain }}:{{ drive_public_port }}"
+    - "overwrite.cli.url --value=https://{{ drive_domain }}"
   changed_when: false

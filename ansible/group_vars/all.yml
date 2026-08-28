@@ -29,20 +29,14 @@ ufw_group_ports:
     - "80"
   drive:
     - "80"
-    - "443"
 
 # Shared drive (Nextcloud) — CHANGE these before deploying for real,
 # or better: move them to an Ansible Vault.
 drive_db_password: "changeme-drive-db"
 drive_db_root_password: "changeme-drive-root"
 
-# Public exposure of the drive: own OVH subdomain + Let's Encrypt certificate
-# obtained through the ACME DNS-01 challenge (the ISP blocks inbound port 80).
-# Caddy creates the validation TXT record via the OVH API — credentials live
-# in secrets.yml (drive_ovh_*). The A record for the subdomain must point to
-# the home public IP (set it in the OVH DNS zone).
+# Public exposure of the drive: Cloudflare Tunnel (outbound-only, no port
+# forwarding, home IP hidden, TLS terminated by Cloudflare). The tunnel token
+# lives in secrets.yml (drive_cloudflare_tunnel_token); the public hostname
+# route is configured in the Cloudflare Zero Trust dashboard.
 drive_domain: "drive.businesscare.space"
-drive_ovh_endpoint: "ovh-eu"
-# External HTTPS port forwarded by the router (443 was taken by the
-# AnyConnect VPN server). Users reach https://<domain>:<this port>.
-drive_public_port: "8443"

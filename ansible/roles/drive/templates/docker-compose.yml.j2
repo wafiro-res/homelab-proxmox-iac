@@ -4,7 +4,6 @@ services:
     image: mariadb:11
     container_name: drive-db
     restart: unless-stopped
-    # Flags recommended by the Nextcloud admin manual
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
       MARIADB_ROOT_PASSWORD: "{{ drive_db_root_password }}"
@@ -14,8 +13,6 @@ services:
     volumes:
       - /srv/drive/db:/var/lib/mysql
 
-  # Memory cache + distributed file locking (best practice for any
-  # multi-user instance: avoids conflicts on concurrent file access).
   redis:
     image: redis:alpine
     container_name: drive-redis
@@ -28,25 +25,24 @@ services:
     depends_on:
       - db
       - redis
+    ports:
+      - "80:80" # LAN / debug access only; the public path goes through the tunnel
     environment:
       MYSQL_HOST: db
       MYSQL_DATABASE: nextcloud
       MYSQL_USER: nextcloud
       MYSQL_PASSWORD: "{{ drive_db_password }}"
       REDIS_HOST: redis
-      NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local {{ drive_domain }}:{{ drive_public_port }}"
-      # HTTPS URLs only for requests coming through the Caddy proxy
-      # (docker network), so plain-HTTP LAN access keeps working.
+      NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local {{ drive_domain }}"
       TRUSTED_PROXIES: "172.16.0.0/12"
       OVERWRITEPROTOCOL: https
-      OVERWRITECONDADDR: "^172\\..*"
-      OVERWRITECLIURL: "https://{{ drive_domain }}:{{ drive_public_port }}"
+      OVERWRITEHOST: "{{ drive_domain }}"
+      OVERWRITECLIURL: "https://{{ drive_domain }}"
       PHP_MEMORY_LIMIT: 1G
       PHP_UPLOAD_LIMIT: 16G
     volumes:
       - /srv/drive/nextcloud:/var/www/html
 
-  # Background jobs every 5 min (official recommendation over AJAX cron).
   cron:
     image: nextcloud:stable
     container_name: drive-cron
@@ -58,21 +54,16 @@ services:
     volumes:
       - /srv/drive/nextcloud:/var/www/html
 
-  # TLS termination with automatic Let's Encrypt certificates.
-  caddy:
-    build:
-      context: /opt/drive/caddy
-      dockerfile: Dockerfile
-    image: drive-caddy-ovh:local
-    container_name: drive-caddy
+  # Cloudflare Tunnel: outbound-only link to Cloudflare's edge. No inbound
+  # port, the home IP stays hidden, TLS is terminated by Cloudflare. The
+  # public hostname -> http://nextcloud:80 route is configured in the
+  # Cloudflare Zero Trust dashboard.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: drive-cloudflared
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /opt/drive/Caddyfile:/etc/caddy/Caddyfile:ro
-      - /srv/drive/caddy-data:/data
-      - /srv/drive/caddy-config:/config
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: "{{ drive_cloudflare_tunnel_token }}"
     depends_on:
       - nextcloud
-
