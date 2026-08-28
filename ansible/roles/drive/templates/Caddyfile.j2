@@ -1,5 +1,12 @@
 # Public site: automatic Let's Encrypt TLS.
+# The public 443 belongs to the router's VPN server, so only the HTTP-01
+# challenge (port 80) can succeed: the TLS-ALPN challenge is disabled.
 {{ drive_domain }} {
+    tls {
+        issuer acme {
+            disable_tlsalpn_challenge
+        }
+    }
     reverse_proxy nextcloud:80
     encode gzip
 }
