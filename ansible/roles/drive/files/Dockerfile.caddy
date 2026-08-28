@@ -1,0 +1,7 @@
+# Caddy with the DuckDNS DNS module: certificates via the ACME DNS-01
+# challenge (no inbound port needed for issuance).
+FROM caddy:2-builder AS builder
+RUN xcaddy build --with github.com/caddy-dns/duckdns
+
+FROM caddy:2
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy

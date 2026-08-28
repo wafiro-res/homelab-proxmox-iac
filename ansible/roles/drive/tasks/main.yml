@@ -37,6 +37,19 @@
     - /srv/drive/caddy-data
     - /srv/drive/caddy-config
 
+- name: Create the Caddy image build directory
+  ansible.builtin.file:
+    path: /opt/drive/caddy
+    state: directory
+    mode: "0755"
+
+- name: Deploy the Caddy Dockerfile (DuckDNS DNS module)
+  ansible.builtin.copy:
+    src: Dockerfile.caddy
+    dest: /opt/drive/caddy/Dockerfile
+    mode: "0644"
+  notify: Restart drive stack
+
 - name: Deploy Caddyfile (TLS reverse proxy)
   ansible.builtin.template:
     src: Caddyfile.j2
@@ -54,3 +67,4 @@
   community.docker.docker_compose_v2:
     project_src: /opt/drive
     state: present
+    build: policy

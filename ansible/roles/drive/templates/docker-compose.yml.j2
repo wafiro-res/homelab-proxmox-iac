@@ -60,7 +60,10 @@ services:
 
   # TLS termination with automatic Let's Encrypt certificates.
   caddy:
-    image: caddy:2
+    build:
+      context: /opt/drive/caddy
+      dockerfile: Dockerfile
+    image: drive-caddy-duckdns:local
     container_name: drive-caddy
     restart: unless-stopped
     ports:
