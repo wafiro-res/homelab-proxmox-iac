@@ -15,23 +15,7 @@ Infrastructure as Code de bout en bout pour mon homelab Proxmox : **Terraform** 
 
 ## Architecture
 
-```mermaid
-flowchart TB
-    TF[Terraform + Ansible<br>sur le nœud de pilotage LXC mgmt-01] -->|provisionne + configure| PVE
-    subgraph PVE["Proxmox VE — HP P420i, SSD + HDD"]
-        proxy["proxy-01 · .51<br>Traefik v3"]
-        apps["apps-01 · .52<br>Hôte Docker"]
-        monitor["monitor-01 · .53<br>Prometheus + Grafana"]
-        web["web-01 · .54<br>nginx — site CV"]
-        subgraph DMZ["drive-01 · .55 — DMZ, pare-feu"]
-            NC["Nextcloud<br>MariaDB · Redis"]
-            CFD["cloudflared"]
-        end
-    end
-    monitor -->|scrape node_exporter :9100| proxy & apps & web & NC
-    CFD -.->|tunnel sortant uniquement| CF([Cloudflare edge])
-    CF -->|HTTPS · URL propre| NET([Utilisateurs internet])
-```
+![Architecture](docs/architecture.png)
 
 Le disque système du drive est sur le SSD (thin-LVM), tandis que son volume de données de 700 Go est sur un HDD séparé — déclaré dans Terraform comme un `data_disk` optionnel par VM.
 

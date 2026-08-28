@@ -15,23 +15,7 @@ End-to-end Infrastructure as Code for my Proxmox homelab: **Terraform** provisio
 
 ## Architecture
 
-```mermaid
-flowchart TB
-    TF[Terraform + Ansible<br>on the mgmt-01 LXC control node] -->|provision + configure| PVE
-    subgraph PVE["Proxmox VE — HP P420i, SSD + HDD"]
-        proxy["proxy-01 · .51<br>Traefik v3"]
-        apps["apps-01 · .52<br>Docker host"]
-        monitor["monitor-01 · .53<br>Prometheus + Grafana"]
-        web["web-01 · .54<br>nginx — CV site"]
-        subgraph DMZ["drive-01 · .55 — DMZ, firewalled"]
-            NC["Nextcloud<br>MariaDB · Redis"]
-            CFD["cloudflared"]
-        end
-    end
-    monitor -->|scrape node_exporter :9100| proxy & apps & web & NC
-    CFD -.->|outbound-only tunnel| CF([Cloudflare edge])
-    CF -->|HTTPS · clean URL| NET([Internet users])
-```
+![Architecture](docs/architecture.png)
 
 The drive's OS disk lives on the SSD (thin-LVM) while its 700 GB data volume sits on a separate HDD datastore — declared in Terraform as an optional `data_disk` per VM.
 
