@@ -76,9 +76,24 @@ ansible-playbook site.yml
 
 Puis ouvrir Grafana sur `http://192.168.213.53:3000` (ou `grafana.lab.local` via Traefik).
 
+## Ajouter une VM en 30 secondes
+
+```bash
+./scripts/newvm.sh add       # interactif : nom, id, groupe, flavor, IP
+./scripts/newvm.sh list
+./scripts/newvm.sh remove <nom>
+```
+
+Le script maintient `terraform/vms.auto.tfvars.json` (chargé automatiquement
+par Terraform, remplace la map `vms` par défaut) et propose d'enchaîner
+`terraform apply` + `ansible-playbook`. La nouvelle VM est clonée, durcie,
+reçoit Docker et apparaît dans Prometheus/Grafana — sans toucher un seul
+fichier à la main.
+
 ## Arborescence
 
 ```
+├── scripts/              # newvm.sh — ajout/suppression/listing interactif de VMs
 ├── terraform/            # Provisionnement des VMs (bpg/proxmox)
 │   └── templates/        # Template de l'inventaire Ansible
 ├── ansible/
