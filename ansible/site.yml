@@ -7,7 +7,10 @@
     # wait for it to finish instead of fighting over the dpkg lock.
     - name: Wait for cloud-init to finish the first boot
       ansible.builtin.command: cloud-init status --wait
+      register: cloud_init_status
       changed_when: false
+      # rc 2 = "done with recoverable warnings" on recent cloud-init: fine.
+      failed_when: cloud_init_status.rc not in [0, 2]
   roles:
     - common
     - hardening
