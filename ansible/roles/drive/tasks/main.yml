@@ -42,6 +42,7 @@
     src: Caddyfile.j2
     dest: /opt/drive/Caddyfile
     mode: "0644"
+  notify: Restart drive stack
 
 - name: Deploy docker-compose file
   ansible.builtin.template:
