@@ -4,6 +4,7 @@ services:
     image: mariadb:11
     container_name: drive-db
     restart: unless-stopped
+    # Flags recommended by the Nextcloud admin manual
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
       MARIADB_ROOT_PASSWORD: "{{ drive_db_root_password }}"
@@ -13,12 +14,20 @@ services:
     volumes:
       - /srv/drive/db:/var/lib/mysql
 
+  # Memory cache + distributed file locking (best practice for any
+  # multi-user instance: avoids conflicts on concurrent file access).
+  redis:
+    image: redis:alpine
+    container_name: drive-redis
+    restart: unless-stopped
+
   nextcloud:
     image: nextcloud:stable
     container_name: drive-nextcloud
     restart: unless-stopped
     depends_on:
       - db
+      - redis
     ports:
       - "80:80"
     environment:
@@ -26,6 +35,21 @@ services:
       MYSQL_DATABASE: nextcloud
       MYSQL_USER: nextcloud
       MYSQL_PASSWORD: "{{ drive_db_password }}"
+      REDIS_HOST: redis
       NEXTCLOUD_TRUSTED_DOMAINS: "{{ ansible_host }} drive.lab.local"
+      PHP_MEMORY_LIMIT: 1G
+      PHP_UPLOAD_LIMIT: 16G
+    volumes:
+      - /srv/drive/nextcloud:/var/www/html
+
+  # Background jobs every 5 min (official recommendation over AJAX cron).
+  cron:
+    image: nextcloud:stable
+    container_name: drive-cron
+    restart: unless-stopped
+    entrypoint: /cron.sh
+    depends_on:
+      - db
+      - redis
     volumes:
       - /srv/drive/nextcloud:/var/www/html
