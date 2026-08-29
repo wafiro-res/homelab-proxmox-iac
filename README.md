@@ -17,7 +17,6 @@ End-to-end Infrastructure as Code for my Proxmox homelab: **Terraform** provisio
 
 ![Architecture](docs/architecture.png)
 
-The drive's OS disk lives on the SSD (thin-LVM) while its 700 GB data volume sits on a separate HDD datastore — declared in Terraform as an optional `data_disk` per VM.
 
 ## What it does
 
