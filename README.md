@@ -17,7 +17,6 @@ End-to-end Infrastructure as Code for my Proxmox homelab: **Terraform** provisio
 
 ![Architecture](docs/architecture.png)
 
-The drive's OS disk lives on the SSD (thin-LVM) while its 700 GB data volume sits on a separate HDD datastore — declared in Terraform as an optional `data_disk` per VM.
 
 ## What it does
 
@@ -107,10 +106,6 @@ Real problems solved while building this — the debugging is half the value:
   with the *host's* IP: a leftover `POSTROUTING ... MASQUERADE` in
   `/etc/iptables/rules.v4` was rewriting every bridged packet's source. Removing
   it restored correct per-source filtering.
-- **Certificates without an open port 80.** The ISP blocks inbound HTTP and the
-  router's VPN already owns 443, so ACME HTTP-01 and TLS-ALPN-01 both fail. The
-  answer was the **DNS-01 challenge**, and ultimately a **Cloudflare Tunnel** —
-  a clean public URL with no port forwarding at all.
 
 ## Repository layout
 

@@ -17,7 +17,6 @@ Infrastructure as Code de bout en bout pour mon homelab Proxmox : **Terraform** 
 
 ![Architecture](docs/architecture.png)
 
-Le disque système du drive est sur le SSD (thin-LVM), tandis que son volume de données de 700 Go est sur un HDD séparé — déclaré dans Terraform comme un `data_disk` optionnel par VM.
 
 ## Ce que ça fait
 
@@ -108,10 +107,6 @@ De vrais problèmes résolus pendant la construction — le debugging fait la mo
   les paquets arrivant avec l'IP *de l'hôte* : un `POSTROUTING ... MASQUERADE`
   résiduel dans `/etc/iptables/rules.v4` réécrivait la source de tout paquet
   ponté. Sa suppression a rétabli le filtrage correct.
-- **Un certificat sans port 80 ouvert.** Le FAI bloque le HTTP entrant et le VPN
-  du routeur occupe déjà le 443 : les défis ACME HTTP-01 et TLS-ALPN-01 échouent
-  tous les deux. La réponse : le **défi DNS-01**, puis finalement un **tunnel
-  Cloudflare** — une URL publique propre sans aucune redirection de port.
 
 ## Arborescence
 
