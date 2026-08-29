@@ -129,6 +129,15 @@ h2{font-family:var(--display);font-weight:600;font-size:clamp(1.7rem,4vw,2.5rem)
 .badge-live{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.72rem;color:var(--a3);
   border:1px solid rgba(74,222,128,.3);background:rgba(74,222,128,.07);border-radius:999px;padding:3px 10px;margin-bottom:14px}
 
+/* recommandation */
+.quote{background:linear-gradient(120deg,rgba(34,211,238,.06),rgba(139,123,255,.06));border:1px solid var(--card-brd);border-radius:24px;padding:46px 44px;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+.quote .qmark{position:absolute;top:-8px;left:24px;font-family:var(--display);font-size:9rem;line-height:1;background:linear-gradient(180deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.22;pointer-events:none}
+.quote blockquote{font-size:clamp(1.1rem,2.2vw,1.42rem);line-height:1.55;color:var(--text);position:relative;margin-bottom:28px;font-weight:500}
+.quote figcaption{display:flex;align-items:center;gap:14px}
+.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;color:#05070c;font-size:1.05rem;flex-shrink:0}
+.quote .who{font-family:var(--display);font-weight:600;font-size:1.02rem}
+.quote .role{color:var(--muted);font-size:.9rem}
+
 /* contact */
 .contact-card{background:linear-gradient(120deg,rgba(34,211,238,.07),rgba(139,123,255,.07));border:1px solid var(--card-brd);
   border-radius:24px;padding:56px 40px;text-align:center;backdrop-filter:blur(10px);position:relative;overflow:hidden}
@@ -156,6 +165,7 @@ footer .self .dot{width:6px;height:6px}
       <a class="nl" href="#about"><span class="fr">À propos</span><span class="en">About</span></a>
       <a class="nl" href="#skills"><span class="fr">Compétences</span><span class="en">Skills</span></a>
       <a class="nl" href="#projects"><span class="fr">Projets</span><span class="en">Projects</span></a>
+      <a class="nl" href="#reco"><span class="fr">Recommandation</span><span class="en">Reference</span></a>
       <a class="nl" href="#contact">Contact</a>
       <button class="lang" id="lang" onclick="toggleLang()">EN</button>
     </div>
@@ -259,6 +269,15 @@ footer .self .dot{width:6px;height:6px}
 
       <div class="proj reveal">
         <div class="head">
+          <h3><span class="fr">Automatisation conformité caméras Samsara (Eurovia)</span><span class="en">Samsara camera compliance automation (Eurovia)</span></h3>
+          <span class="yr">zenconnect</span>
+        </div>
+        <p><span class="fr">Développement d'un programme vérifiant la conformité d'installation des boîtiers caméras embarqués sur la flotte de véhicules Eurovia. Un vrai pont entre développement, opérationnel et sécurité&nbsp;: la solution garantit le bon fonctionnement des dispositifs de prévention routière (somnolence, distraction, téléphone au volant, freinages brusques, port de la ceinture).</span><span class="en">Built a program that verifies the correct installation of Samsara onboard camera units across Eurovia's vehicle fleet. A real bridge between development, operations and security: the solution ensures the road-safety features work as intended (drowsiness, distraction, phone use, harsh braking, seatbelt detection).</span></p>
+        <div class="tags"><span class="t">Automatisation</span><span class="t">DevSecOps</span><span class="t">Scripting</span><span class="t">Samsara</span></div>
+      </div>
+
+      <div class="proj reveal">
+        <div class="head">
           <h3><span class="fr">Maquettage &amp; migration d'infra d'entreprise</span><span class="en">Enterprise infrastructure mock-up &amp; migration</span></h3>
           <span class="yr">2025 – 2026</span>
         </div>
@@ -271,8 +290,8 @@ footer .self .dot{width:6px;height:6px}
           <h3><span class="fr">Alternance Cloud &amp; DevOps · zenconnect</span><span class="en">Cloud &amp; DevOps apprentice · zenconnect</span></h3>
           <span class="yr">2023 – 2026</span>
         </div>
-        <p><span class="fr">Pilotage technique et intégration d'architectures de bout en bout pour des comptes d'envergure (Louis Vuitton, Chopard, Burger King, Groupe Bertrand). Audits Wi-Fi, mise en service de sites à distance, déploiement de l'écosystème cloud Verkada, et rédaction de dossiers d'architecture technique.</span><span class="en">Technical lead and end-to-end architecture integration for major accounts (Louis Vuitton, Chopard, Burger King, Groupe Bertrand). Wi-Fi audits, remote site commissioning, Verkada cloud ecosystem deployment, and technical architecture documentation.</span></p>
-        <div class="tags"><span class="t">Réseau</span><span class="t">Wi-Fi</span><span class="t">Verkada</span><span class="t">MCO</span><span class="t">Documentation</span></div>
+        <p><span class="fr">Pilotage technique et intégration d'architectures réseau &amp; sécurité de bout en bout pour de grands comptes (Louis Vuitton, RATP, Eurovia, Nespresso, Burger King, Chopard). Virtualisation de serveurs internes sous Proxmox (Docker, PPPoE), gestion des identités via OneLogin, réseaux LAN/WAN/SD-WAN, mise en service de sites à distance et déploiement de l'écosystème cloud Verkada.</span><span class="en">Technical lead and end-to-end network &amp; security architecture integration for major accounts (Louis Vuitton, RATP, Eurovia, Nespresso, Burger King, Chopard). Virtualization of internal servers on Proxmox (Docker, PPPoE), identity management with OneLogin, LAN/WAN/SD-WAN networks, remote site commissioning and Verkada cloud ecosystem deployment.</span></p>
+        <div class="tags"><span class="t">Proxmox</span><span class="t">SD-WAN</span><span class="t">OneLogin</span><span class="t">Verkada</span><span class="t">Réseau</span><span class="t">MCO</span></div>
       </div>
 
       <div class="proj reveal">
@@ -285,6 +304,28 @@ footer .self .dot{width:6px;height:6px}
       </div>
 
     </div>
+  </section>
+
+  <section id="reco">
+    <div class="eyebrow reveal"><span class="fr">Recommandation</span><span class="en">Reference</span></div>
+    <h2 class="reveal"><span class="fr">Ce qu'on dit de mon travail</span><span class="en">What people say about my work</span></h2>
+    <figure class="quote reveal">
+      <div class="qmark">&ldquo;</div>
+      <blockquote>
+        <span class="fr">Walid est un collaborateur précieux sur lequel on peut compter les yeux fermés. Son profil complet, alliant terrain, réseau, virtualisation et développement, apportera une véritable valeur ajoutée à vos équipes. Toute entreprise aura une immense chance de pouvoir le compter parmi ses effectifs.</span>
+        <span class="en">Walid is an invaluable teammate you can count on completely. His well-rounded profile across field work, networking, virtualization and development brings real added value to any team. Any company would be very lucky to have him.</span>
+      </blockquote>
+      <figcaption>
+        <div class="avatar">SS</div>
+        <div>
+          <div class="who">Sylia Sadoud</div>
+          <div class="role"><span class="fr">Ingénieure Réseaux &amp; Cybersécurité · Zenconnect</span><span class="en">Network &amp; Cybersecurity Engineer · Zenconnect</span></div>
+        </div>
+      </figcaption>
+      <a class="btn ghost" href="recommandation.pdf" target="_blank" rel="noopener" style="margin-top:26px">
+        <span class="fr">Lire la lettre complète</span><span class="en">Read the full letter</span> ↗
+      </a>
+    </figure>
   </section>
 
   <section id="contact">
