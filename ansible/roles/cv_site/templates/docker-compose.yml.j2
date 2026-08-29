@@ -5,6 +5,19 @@ services:
     container_name: cv-site
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "80:80" # LAN / Traefik access; the public path goes through the tunnel
     volumes:
       - /opt/cv-site/www:/usr/share/nginx/html:ro
+
+  # Cloudflare Tunnel: outbound-only, no open port, TLS terminated by Cloudflare.
+  # Public hostname portfolio.businesscare.space -> http://cv-site:80 is set in
+  # the Cloudflare Zero Trust dashboard.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: portfolio-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: "{{ portfolio_cloudflare_tunnel_token }}"
+    depends_on:
+      - cv-site
